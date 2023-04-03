@@ -111,4 +111,6 @@ func main() {
 
 		fmt.Printf("%s - %s = %.2f\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"), avg)
 	}
+	fmt.Println("Press Enter to exit...")
+	fmt.Scanln()
 }
