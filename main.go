@@ -38,8 +38,8 @@ func main() {
 
 
 	// Initialize start and end times
-	startTime := time.Date(2023, 4, 3, 5, 0, 0, 0, time.UTC)
-	endTime := time.Date(2023, 4, 3, 19, 0, 0, 0, time.UTC)
+	startTime := time.Date(inputyear, time.Month(inputmonth), inputday, 5, 0, 0, 0, time.UTC)
+	endTime := time.Date(inputyear, time.Month(inputmonth), inputday, 19, 0, 0, 0, time.UTC)
 
 	// Initialize map to store values for each 5-minute interval
 	values := make(map[time.Time][]float64)
