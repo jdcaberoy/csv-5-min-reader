@@ -18,6 +18,24 @@ func main() {
 		log.Fatal(err)
 	}
 	defer file.Close()
+	var inputmonth, inputday, inputyear int
+	today := time.Now()
+	fmt.Println("input month:")
+	fmt.Scanln(&inputmonth)
+	fmt.Println("input day:")
+	fmt.Scanln(&inputday)
+	fmt.Println("input year:")
+	fmt.Scanln(&inputyear)
+	if inputmonth == 0{
+		today.Month()
+	}
+	if inputday == 0 {
+		today.Day()
+	}
+	if inputyear ==0 {
+		today.Year()
+	}
+
 
 	// Initialize start and end times
 	startTime := time.Date(2023, 4, 3, 5, 0, 0, 0, time.UTC)
