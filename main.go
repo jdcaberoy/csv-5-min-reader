@@ -95,9 +95,9 @@ func main() {
 	// index := f.NewSheet("Sheet1")
 
 	row := 1
-	// col := 0
+	col := 'A'
 
-	excelInterval := 0
+	// excelInterval := 0
 
 
 	// Calculate average for each interval
@@ -113,12 +113,16 @@ func main() {
 
 		if len(valueList) == 0 {
 			fmt.Printf("%s - %s = 0.00\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"))
-			cell := fmt.Sprintf("%c%d", 'A'+excelInterval, excelInterval+row)
-			f.SetCellValue("Sheet1", cell, excelInterval)
-			excelInterval++
-			if excelInterval % 5 ==0 {
+
+			cell := fmt.Sprintf("%c%d", col , row)
+			f.SetCellValue("Sheet1", cell, 0.00)
+			// excelInterval++
+			col++
+			row ++
+			if row % 11 ==0 {
 				row++
-				excelInterval = 0
+				col = 'A'
+				row = 1
 			}
 			continue
 		}
@@ -130,6 +134,16 @@ func main() {
 		avg := sum / float64(len(valueList))
 
 		fmt.Printf("%s - %s = %.2f\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"), avg)
+		cell := fmt.Sprintf("%c%d", col , row)
+		f.SetCellValue("Sheet1", cell, avg)
+		// excelInterval++
+		col++
+		row ++
+		if row % 11 ==0 {
+			row++
+			col = 'A'
+			row = 1
+		}
 	}
 
 	err = f.SaveAs("output.xlsx")
@@ -141,7 +155,12 @@ func main() {
 
 	for {
 		fmt.Println("Press CTRL+C to exit...")
+		fmt.Scanln()
 	}
 	// fmt.Println("Press Enter to exit...")
 	// fmt.Scanln()
+}
+
+func toChar(i int) rune {
+    return rune('A' - 1 + i)
 }
