@@ -3,19 +3,15 @@ package main
 import (
 	"encoding/csv"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
-	// "github.com/qax-os/excelize/v2"
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
 func main() {
-	// Open CSV file
 	file, err := os.Open("data.csv")
 	if err != nil {
 		log.Fatal(err)
@@ -39,125 +35,83 @@ func main() {
 		today.Year()
 	}
 
-
-	// Initialize start and end times
-	startTime := time.Date(inputyear, time.Month(inputmonth), inputday, 5, 0, 0, 0, time.UTC)
-	endTime := time.Date(inputyear, time.Month(inputmonth), inputday, 19, 0, 0, 0, time.UTC)
-
-	// Initialize map to store values for each 5-minute interval
-	values := make(map[time.Time][]float64)
-
-	// Read CSV file
 	reader := csv.NewReader(file)
-	reader.Comma = ','
-	reader.Comment = '#'
-	reader.TrimLeadingSpace = true
-	if _, err := reader.Read(); err != nil {
+	if _, err := reader.Read(); err != nil { // skip header row
 		log.Fatal(err)
 	}
 
+	// Initialize Excel file
+	f := excelize.NewFile()
+	index := f.NewSheet("Sheet1")
+	f.SetActiveSheet(index)
+
+	// Initialize time parameters
+	startTime := time.Date(inputyear, time.Month(inputmonth), inputday, 5, 0, 0, 0, time.UTC)
+	endTime := time.Date(inputyear, time.Month(inputmonth), inputday, 19, 0, 0, 0, time.UTC)
+	interval := time.Minute * 5
+
+	// Initialize row and column values for Excel
+	row := 1
+	col := 1
+
+	// Initialize map to store values
+	values := make(map[string]float64)
+
+	// Loop through CSV file and store values in map
 	for {
-		// Read row
-		row, err := reader.Read()
-		if err == io.EOF {
+		rowData, err := reader.Read()
+		if err != nil {
 			break
-		} else if err != nil {
-			log.Fatal(err)
 		}
 
-		// Parse date
-		dateString := row[2]
-		date, err := time.Parse("02/01/2006 15:04:05", dateString)
+		t, err := time.Parse("01/02/2006 15:04:05", rowData[2])
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// Skip if date is outside of desired range
-		if date.Before(startTime) || date.After(endTime) {
+		if t.Before(startTime) || t.After(endTime) {
 			continue
 		}
 
-		// Parse value
-		value, err := strconv.ParseFloat(strings.TrimSpace(row[6]), 64)
+		value, err := strconv.ParseFloat(rowData[6], 64)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// Calculate interval start time
-		intervalStart := time.Date(date.Year(), date.Month(), date.Day(), date.Hour(), (date.Minute()/5)*5, 0, 0, date.Location())
-
-		// Append value to interval
-		values[intervalStart] = append(values[intervalStart], value)
+		key := t.Truncate(interval).Format("15:04:05")
+		values[key] += value
 	}
 
-	// Create new excel file
-	f := excelize.NewFile()
-	// index := f.NewSheet("Sheet1")
+	// Loop through time interval and insert values into Excel
+	for currentTime := startTime; currentTime.Before(endTime); currentTime = currentTime.Add(interval) {
+		// Calculate end time for current interval
+		// endTime := currentTime.Add(interval)
 
-	row := 1
-	col := 'A'
+		// Get average value for current interval
+		key := currentTime.Format("15:04:05")
+		averageValue := values[key] / float64(interval/time.Minute)
 
-	// excelInterval := 0
+		// Add value to Excel sheet
+		cell := fmt.Sprintf("%s%d", excelize.ToAlphaString(col), row)
+		f.SetCellValue("Sheet1", cell, averageValue)
 
-
-	// Calculate average for each interval
-	for i := startTime; i.Before(endTime); i = i.Add(5 * time.Minute) {
-		intervalStart := i
-		intervalEnd := i.Add(5 * time.Minute)
-
-		if intervalEnd.After(endTime) {
-			intervalEnd = endTime
-		}
-
-		valueList := values[intervalStart]
-
-		if len(valueList) == 0 {
-			fmt.Printf("%s - %s = 0.00\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"))
-
-			cell := fmt.Sprintf("%c%d", col , row)
-			fmt.Println(cell)
-			f.SetCellValue("Sheet1", cell, 0.00)
-			// excelInterval++
+		// Move to next column or row
+		if col < 10 {
 			col++
-			if row % 11 ==0 {
-				col = 'A'
-				row++
-			}
-			continue
-		}
-
-		sum := 0.0
-		for _, value := range valueList {
-			sum += value
-		}
-		avg := sum / float64(len(valueList))
-
-		fmt.Printf("%s - %s = %.2f\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"), avg)
-		cell := fmt.Sprintf("%c%d", col , row)
-		fmt.Printf("cell: %v, avg: %v\n", cell, avg)
-		f.SetCellValue("Sheet1", cell, avg)
-		// excelInterval++
-		col++
-		if row % 11 ==0 {
-			col = 'A'
+		} else {
+			col = 1
 			row++
 		}
 	}
 
-	err = f.SaveAs("output.xlsx")
-	if err != nil {
-		fmt.Println(err)
+	// Save Excel file
+	if err := f.SaveAs("output.xlsx"); err != nil {
+		log.Fatal(err)
 	}
 	fmt.Println("Excel file created successfully.")
-
+	
 	for {
 		fmt.Println("Press CTRL+C to exit...")
 		fmt.Scanln()
 	}
-	// fmt.Println("Press Enter to exit...")
-	// fmt.Scanln()
-}
-
-func toChar(i int) rune {
-    return rune('A' - 1 + i)
 }
