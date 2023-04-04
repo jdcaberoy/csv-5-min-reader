@@ -115,14 +115,13 @@ func main() {
 			fmt.Printf("%s - %s = 0.00\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"))
 
 			cell := fmt.Sprintf("%c%d", col , row)
+			fmt.Println(cell)
 			f.SetCellValue("Sheet1", cell, 0.00)
 			// excelInterval++
 			col++
-			row ++
 			if row % 11 ==0 {
-				row++
 				col = 'A'
-				row = 1
+				row++
 			}
 			continue
 		}
@@ -135,14 +134,13 @@ func main() {
 
 		fmt.Printf("%s - %s = %.2f\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"), avg)
 		cell := fmt.Sprintf("%c%d", col , row)
+		fmt.Println(cell)
 		f.SetCellValue("Sheet1", cell, avg)
 		// excelInterval++
 		col++
-		row ++
 		if row % 11 ==0 {
-			row++
 			col = 'A'
-			row = 1
+			row++
 		}
 	}
 
