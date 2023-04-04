@@ -134,7 +134,7 @@ func main() {
 
 		fmt.Printf("%s - %s = %.2f\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"), avg)
 		cell := fmt.Sprintf("%c%d", col , row)
-		fmt.Println(cell)
+		fmt.Printf("cell: %v, avg: %v\n", cell, avg)
 		f.SetCellValue("Sheet1", cell, avg)
 		// excelInterval++
 		col++
@@ -147,7 +147,6 @@ func main() {
 	err = f.SaveAs("output.xlsx")
 	if err != nil {
 		fmt.Println(err)
-		return
 	}
 	fmt.Println("Excel file created successfully.")
 
