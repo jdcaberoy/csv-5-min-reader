@@ -9,6 +9,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	// "github.com/qax-os/excelize/v2"
+	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
 func main() {
@@ -87,6 +90,16 @@ func main() {
 		values[intervalStart] = append(values[intervalStart], value)
 	}
 
+	// Create new excel file
+	f := excelize.NewFile()
+	// index := f.NewSheet("Sheet1")
+
+	row := 1
+	// col := 0
+
+	excelInterval := 0
+
+
 	// Calculate average for each interval
 	for i := startTime; i.Before(endTime); i = i.Add(5 * time.Minute) {
 		intervalStart := i
@@ -100,6 +113,13 @@ func main() {
 
 		if len(valueList) == 0 {
 			fmt.Printf("%s - %s = 0.00\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"))
+			cell := fmt.Sprintf("%c%d", 'A'+excelInterval, excelInterval+row)
+			f.SetCellValue("Sheet1", cell, excelInterval)
+			excelInterval++
+			if excelInterval % 5 ==0 {
+				row++
+				excelInterval = 0
+			}
 			continue
 		}
 
@@ -111,6 +131,17 @@ func main() {
 
 		fmt.Printf("%s - %s = %.2f\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"), avg)
 	}
-	fmt.Println("Press Enter to exit...")
-	fmt.Scanln()
+
+	err = f.SaveAs("output.xlsx")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Excel file created successfully.")
+
+	for {
+		fmt.Println("Press CTRL+C to exit...")
+	}
+	// fmt.Println("Press Enter to exit...")
+	// fmt.Scanln()
 }
