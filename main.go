@@ -97,11 +97,15 @@ func main() {
 		intervalStart := i
 		intervalEnd := i.Add(5 * time.Minute)
 
+		// fmt.Printf("DEBUG01: %v - %v\n", intervalStart, intervalEnd)
+
 		if intervalEnd.After(endTime) {
 			intervalEnd = endTime
 		}
 
 		valueList := values[intervalStart]
+
+		// fmt.Printf("DEBUG02: %v len:%v\n", valueList, len(valueList))
 
 		if len(valueList) == 0 {
 			fmt.Printf("%s - %s = 0.00\n", intervalStart.Format("15:04:05"), intervalEnd.Format("15:04:05"))
@@ -138,7 +142,8 @@ func main() {
 		}
 	}
 
-	err = f.SaveAs("output.xlsx")
+	fileTitle := fmt.Sprintf("5minsoutput %v-%v-%v.xlsx", inputmonth, inputday, inputyear)
+	err = f.SaveAs(fileTitle)
 	if err != nil {
 		fmt.Println(err)
 		return
