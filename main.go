@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	
+
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
 
@@ -22,6 +22,7 @@ func main() {
 	defer file.Close()
 	var inputmonth, inputday, inputyear int
 
+	// Allow user to input desired date
 	today := time.Now()
 	fmt.Println("input month:")
 	fmt.Scanln(&inputmonth)
@@ -29,16 +30,20 @@ func main() {
 	fmt.Scanln(&inputday)
 	fmt.Println("input year:")
 	fmt.Scanln(&inputyear)
-	if inputmonth == 0{
+	if inputmonth == 0 {
 		today.Month()
 	}
 	if inputday == 0 {
 		today.Day()
 	}
-	if inputyear ==0 {
+	if inputyear == 0 {
 		today.Year()
 	}
 
+	// Add limit to useability
+	if today.After(time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local)) {
+		return
+	}
 
 	// Initialize start and end times
 	startTime := time.Date(inputyear, time.Month(inputmonth), inputday, 5, 0, 0, 0, time.UTC)
@@ -126,15 +131,16 @@ func main() {
 	// Create new excel file
 	f := excelize.NewFile()
 
-	// set internal interval for excel
+	// Set internal interval for excel
 	eInterval := 0
 
+	// Sample input for excel
 	f.SetCellValue("Sheet1", "A30", "sample")
 
 	// set row for 14 hours
-	for row:= 1; row <= 14 ; row++ {
+	for row := 1; row <= 14; row++ {
 		// set column for 6 - 5min intervals
-		for col:= 'A'; col <= 'L' ; col++ {
+		for col := 'A'; col <= 'L'; col++ {
 			cell := fmt.Sprintf("%c%d", col, row)
 			cellwrite := fmt.Sprintf("%.2f", eValues[eInterval])
 			f.SetCellValue("Sheet1", cell, cellwrite)
@@ -142,7 +148,7 @@ func main() {
 		}
 	}
 
-	fileTitle := fmt.Sprintf("5minsoutput %v-%v-%v.xlsx", inputmonth, inputday, inputyear)
+	fileTitle := fmt.Sprintf("5minsoutput %v-%v-%v.xlsx", inputyear, inputmonth, inputday)
 	err = f.SaveAs(fileTitle)
 	if err != nil {
 		fmt.Println(err)
