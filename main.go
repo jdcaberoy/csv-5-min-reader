@@ -41,15 +41,15 @@ func main() {
 	}
 
 	// Add limit to useability
-	if today.After(time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local)) {
-		return
-	}
+	// if today.After(time.Date(2024, 1, 1, 0, 0, 0, 0, time.Local)) {
+	// 	return
+	// }
 
 	// Initialize start and end times
 	// startTime := time.Date(inputyear, time.Month(inputmonth), inputday, 5, 0, 0, 0, time.UTC)
 	// Hard coded year just because
 	startTime := time.Date(inputyear, time.Month(inputmonth), inputday, 5, 0, 0, 0, time.UTC)
-	endTime := time.Date(2023, time.Month(inputmonth), inputday, 19, 0, 0, 0, time.UTC)
+	endTime := time.Date(2024, time.Month(inputmonth), inputday, 19, 0, 0, 0, time.UTC)
 
 	// Initialize map to store values for each 5-minute interval
 	values := make(map[time.Time][]float64)
